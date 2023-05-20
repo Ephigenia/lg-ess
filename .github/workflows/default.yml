@@ -1,0 +1,65 @@
+name: default
+
+on:
+  push:
+    branches:
+    - main
+    - alpha
+    - beta
+  pull_request:
+
+jobs:
+  # https://github.com/github/super-linter
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        # Full git history is needed to get a proper list of changed files within `super-linter`
+        fetch-depth: 0
+    - uses: github/super-linter/slim@v5
+      env:
+        DEFAULT_BRANCH: master
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        VALIDATE_ALL_CODEBASE: false
+        VALIDATE_JAVASCRIPT_ES: true
+        VALIDATE_EDITORCONFIG: true
+
+  build:
+    runs-on: ubuntu-latest
+    needs: [lint]
+    steps:
+    - uses: actions/checkout@v3
+    - uses: ./.github/actions/setup
+    - run: npm run build
+
+  test:
+    runs-on: ubuntu-latest
+    needs: [lint, build]
+
+    steps:
+    - uses: actions/checkout@v3
+    - uses: ./.github/actions/setup
+    - run: npm test
+
+  release:
+    # minimum required permissions by semantic-release
+    # SEE https://github.com/semantic-release/github#github-authentication
+    permissions:
+      contents: write
+      issues: write
+      pull-requests: write
+    # ignore pull-requests created by dependabot as it doesn’t has access
+    # to the secrets used
+    if: ${{ github.actor != 'dependabot[bot]' }}
+    runs-on: ubuntu-latest
+    needs: [test]
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          persist-credentials: false
+      - uses: ./.github/actions/setup
+      - run: npx semantic-release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN_RELEASE }}
