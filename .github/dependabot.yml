@@ -11,6 +11,16 @@ updates:
     schedule:
       interval: "weekly"
 
+    groups:
+      # put all but the only production package into the "dev" update so that
+      # there’ll be just one big pull-request containing devDependencies updates
+      dev:
+        exclude-patterns:
+          - "axios*"
+          - "dotenv*"
+        patterns:
+          - "*"
+
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
