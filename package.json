@@ -70,10 +70,10 @@
     "dotenv": "18.0.4"
   },
   "devDependencies": {
-    "@types/node": "26.6.1",
-    "@typescript-eslint/eslint-plugin": "8.70.0",
-    "@typescript-eslint/parser": "8.70.0",
-    "eslint": "10.10.0",
+    "@types/node": "26.6.2",
+    "@typescript-eslint/eslint-plugin": "8.70.1",
+    "@typescript-eslint/parser": "8.70.1",
+    "eslint": "10.11.0",
     "ts-node": "10.9.2",
     "typescript": "7.0.2"
   }
